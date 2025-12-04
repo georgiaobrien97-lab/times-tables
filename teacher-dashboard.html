@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Times Tables Assessment - Teacher Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            font-size: 2em;
+            color: #333;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        select, input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f8f9fa;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            background: #e9ecef;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .class-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .accuracy-good {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .accuracy-medium {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        
+        .accuracy-poor {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            color: #1976d2;
+        }
+        
+        .empty h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .tips {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .tips h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .tips ul {
+            margin-left: 20px;
+            color: #555;
+        }
+        
+        .sort-indicator {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Times Tables Assessment</h1>
+                    <p class="subtitle">Teacher Dashboard</p>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" id="refreshBtn">🔄 Refresh</button>
+                    <button class="btn-success" id="exportBtn">📥 Export CSV</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">👥 Total Students</div>
+                <div class="stat-value" id="totalStudents">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">📝 Total Assessments</div>
+                <div class="stat-value" id="totalAssessments">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🎯 Average Accuracy</div>
+                <div class="stat-value" id="avgAccuracy">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">⏱️ Average Time</div>
+                <div class="stat-value" id="avgTime">0s</div>
+            </div>
+        </div>
+        
+        <div class="filters" id="filters" style="display: none;">
+            <div class="filter-group">
+                <label for="classFilter">Filter by Class</label>
+                <select id="classFilter">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="studentFilter">Filter by Student Number</label>
+                <input type="text" id="studentFilter" placeholder="Enter student number...">
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <div id="loadingMessage" class="loading">
+                <h3>Loading data...</h3>
+                <p>Please wait while we fetch the assessment results.</p>
+            </div>
+            
+            <div id="emptyMessage" class="empty" style="display: none;">
+                <h3>No results yet!</h3>
+                <p>Student results will appear here once they complete assessments.</p>
+                <p style="margin-top: 10px; font-size: 0.9em;">Make sure students are using the student quiz link.</p>
+            </div>
+            
+            <table id="resultsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th data-sort="date">Date & Time <span class="sort-indicator"></span></th>
+                        <th data-sort="studentNumber">Student # <span class="sort-indicator"></span></th>
+                        <th data-sort="classLetter">Class <span class="sort-indicator"></span></th>
+                        <th data-sort="score">Score <span class="sort-indicator"></span></th>
+                        <th data-sort="accuracy">Accuracy <span class="sort-indicator"></span></th>
+                        <th data-sort="totalTime">Total Time <span class="sort-indicator"></span></th>
+                        <th data-sort="avgTime">Avg/Q <span class="sort-indicator"></span></th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tips">
+            <h3>💡 Students to Focus On:</h3>
+            <p>Consider providing additional support for students with:</p>
+            <ul>
+                <li>Accuracy below 75% (shown in red)</li>
+                <li>Average time per question above 10 seconds</li>
+                <li>Multiple attempts with no improvement</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxE0eyJ8mCJ2Pne6Cn7Vh799uQ_L1q5w7_tWI54Ffc9W0QJPjvmRgYbr4dPm-0OzokI/exec';
+        
+        let allData = [];
+        let filteredData = [];
+        let sortColumn = 'date';
+        let sortDirection = 'desc';
+        
+        // Load data
+        async function loadData() {
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('emptyMessage').style.display = 'none';
+            document.getElementById('resultsTable').style.display = 'none';
+            
+            try {
+                const response = await fetch(SHEET_URL);
+                const data = await response.json();
+                
+                allData = data;
+                applyFilters();
+                updateStats();
+                updateClassFilter();
+                renderTable();
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                
+                if (data.length === 0) {
+                    document.getElementById('emptyMessage').style.display = 'block';
+                } else {
+                    document.getElementById('resultsTable').style.display = 'table';
+                    document.getElementById('statsGrid').style.display = 'grid';
+                    document.getElementById('filters').style.display = 'grid';
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loadingMessage').innerHTML = '<h3 style="color: #ef4444;">Error loading data</h3><p>Please check your connection and try again.</p>';
+            }
+        }
+        
+        // Update stats
+        function updateStats() {
+            const uniqueStudents = new Set(allData.map(d => d.StudentNumber || d.studentNumber)).size;
+            const totalAssessments = allData.length;
+            const avgAccuracy = allData.length > 0 
+                ? (allData.reduce((sum, d) => sum + parseFloat(d.Accuracy || d.accuracy || 0), 0) / allData.length).toFixed(1)
+                : 0;
+            const avgTime = allData.length > 0
+                ? (allData.reduce((sum, d) => sum + parseFloat(d.TotalTime || d.totalTime || 0), 0) / allData.length).toFixed(1)
+                : 0;
+            
+            document.getElementById('totalStudents').textContent = uniqueStudents;
+            document.getElementById('totalAssessments').textContent = totalAssessments;
+            document.getElementById('avgAccuracy').textContent = avgAccuracy + '%';
+            document.getElementById('avgTime').textContent = avgTime + 's';
+        }
+        
+        // Update class filter
+        function updateClassFilter() {
+            const classes = [...new Set(allData.map(d => d.ClassLetter || d.classLetter))].filter(Boolean).sort();
+            const select = document.getElementById('classFilter');
+            select.innerHTML = '<option value="">All Classes</option>';
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.textContent = cls;
+                select.appendChild(option);
+            });
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const classFilter = document.getElementById('classFilter').value;
+            const studentFilter = document.getElementById('studentFilter').value;
+            
+            filteredData = allData.filter(row => {
+                const classLetter = (row.ClassLetter || row.classLetter || '').toString();
+                const studentNum = (row.StudentNumber || row.studentNumber || '').toString();
+                
+                const matchesClass = !classFilter || classLetter === classFilter;
+                const matchesStudent = !studentFilter || studentNum.includes(studentFilter);
+                
+                return matchesClass && matchesStudent;
+            });
+            
+            sortData();
+        }
+        
+        // Sort data
+        function sortData() {
+            filteredData.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(sortColumn) {
+                    case 'date':
+                        aVal = a.Timestamp || a.timestamp;
+                        bVal = b.Timestamp || b.timestamp;
+                        break;
+                    case 'studentNumber':
+                        aVal = a.StudentNumber || a.studentNumber;
+                        bVal = b.StudentNumber || b.studentNumber;
+                        break;
+                    case 'classLetter':
+                        aVal = a.ClassLetter || a.classLetter;
+                        bVal = b.ClassLetter || b.classLetter;
+                        break;
+                    case 'score':
+                        aVal = parseFloat(a.CorrectAnswers || a.correctAnswers || 0);
+                        bVal = parseFloat(b.CorrectAnswers || b.correctAnswers || 0);
+                        break;
+                    case 'accuracy':
+                        aVal = parseFloat(a.Accuracy || a.accuracy || 0);
+                        bVal = parseFloat(b.Accuracy || b.accuracy || 0);
+                        break;
+                    case 'totalTime':
+                        aVal = parseFloat(a.TotalTime || a.totalTime || 0);
+                        bVal = parseFloat(b.TotalTime || b.totalTime || 0);
+                        break;
+                    case 'avgTime':
+                        aVal = parseFloat(a.AvgTimePerQuestion || a.avgTimePerQuestion || 0);
+                        bVal = parseFloat(b.AvgTimePerQuestion || b.avgTimePerQuestion || 0);
+                        break;
+                }
+                
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            
+            // Update sort indicators
+            document.querySelectorAll('th .sort-indicator').forEach(span => {
+                span.textContent = '';
+            });
+            const activeHeader = document.querySelector(`th[data-sort="${sortColumn}"] .sort-indicator`);
+            if (activeHeader) {
+                activeHeader.textContent = sortDirection === 'asc' ? '↑' : '↓';
+            }
+            
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                const date = row.Date || row.date || new Date(row.Timestamp || row.timestamp).toLocaleDateString();
+                const studentNum = row.StudentNumber || row.studentNumber;
+                const classLetter = row.ClassLetter || row.classLetter;
+                const correctAnswers = row.CorrectAnswers || row.correctAnswers;
+                const totalQuestions = row.TotalQuestions || row.totalQuestions || 20;
+                const accuracy = parseFloat(row.Accuracy || row.accuracy || 0);
+                const totalTime = row.TotalTime || row.totalTime;
+                const avgTime = row.AvgTimePerQuestion || row.avgTimePerQuestion;
+                
+                let accuracyClass = 'accuracy-good';
+                if (accuracy < 75) accuracyClass = 'accuracy-poor';
+                else if (accuracy < 90) accuracyClass = 'accuracy-medium';
+                
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td><strong>${studentNum}</strong></td>
+                    <td><span class="class-badge">${classLetter}</span></td>
+                    <td><strong>${correctAnswers}/${totalQuestions}</strong></td>
+                    <td><span class="${accuracyClass}">${accuracy}%</span></td>
+                    <td>${totalTime}s</td>
+                    <td>${avgTime}s</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            if (filteredData.length === 0 && allData.length > 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">No results match your filters.</td></tr>';
+            }
+        }
+        
+        // Export to CSV
+        function exportToCSV() {
+            const headers = ['Timestamp', 'Date', 'Time', 'Student Number', 'Class', 'Correct Answers', 'Total Questions', 'Accuracy', 'Total Time', 'Avg Time'];
+            const csvData = filteredData.map(row => [
+                row.Timestamp || row.timestamp || '',
+                row.Date || row.date || '',
+                row.Time || row.time || '',
+                row.StudentNumber || row.studentNumber || '',
+                row.ClassLetter || row.classLetter || '',
+                row.CorrectAnswers || row.correctAnswers || '',
+                row.TotalQuestions || row.totalQuestions || '20',
+                row.Accuracy || row.accuracy || '',
+                row.TotalTime || row.totalTime || '',
+                row.AvgTimePerQuestion || row.avgTimePerQuestion || ''
+            ]);
+            
+            const csvContent = [
+                headers.join(','),
+                ...csvData.map(row => row.join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TimesTablesResults_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+        
+        // Event listeners
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+        document.getElementById('classFilter').addEventListener('change', () => {
+            applyFilters();
+            renderTable();
+        });
+        document.getElementById('studentFilter').addEventListener('input', () => {
+            applyFilters();
+            renderTable();
+        });
+        
+        // Table header sorting
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const newSortColumn = th.dataset.sort;
+                if (sortColumn === newSortColumn) {
+                    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortColumn = newSortColumn;
+                    sortDirection = 'asc';
+                }
+                applyFilters();
+                renderTable();
+            });
+        });
+        
+        // Initial load
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Times Tables Speed Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
+        .intro {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        input.uppercase {
+            text-transform: uppercase;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            color: #555;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+        }
+        
+        .question-screen {
+            text-align: center;
+        }
+        
+        .timer {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .progress {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s;
+        }
+        
+        .question {
+            font-size: 4em;
+            font-weight: bold;
+            color: #333;
+            margin: 30px 0;
+        }
+        
+        .prompt {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .results-screen {
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .result-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 10px;
+            color: #155724;
+            margin: 20px 0;
+        }
+        
+        .answers-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .answer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .answer-correct {
+            background: #d4edda;
+        }
+        
+        .answer-incorrect {
+            background: #f8d7da;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1>Times Tables</h1>
+            <h2>Speed Assessment</h2>
+            <p class="intro">You'll have 20 questions to answer as quickly and accurately as possible!</p>
+            
+            <div class="input-group">
+                <label for="studentNumber">Student Number</label>
+                <input type="text" id="studentNumber" placeholder="Enter your student number">
+            </div>
+            
+            <div class="input-group">
+                <label for="classLetter">Class Letter</label>
+                <input type="text" id="classLetter" class="uppercase" maxlength="3" placeholder="e.g., 7A, 7B, 7C">
+            </div>
+            
+            <button id="startBtn">Start Assessment</button>
+            
+            <div class="instructions">
+                <h3>Instructions:</h3>
+                <ul>
+                    <li>Answer 20 multiplication questions</li>
+                    <li>Work as quickly and accurately as you can</li>
+                    <li>Your time and accuracy will be recorded</li>
+                    <li>Press Enter or click Submit for each answer</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Question Screen -->
+        <div id="questionScreen" class="hidden question-screen">
+            <div class="timer" id="timer">0:00</div>
+            <div class="progress">Question <span id="currentQ">1</span> / 20</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 5%"></div>
+            </div>
+            <div class="question" id="question">7 × 8</div>
+            <p class="prompt">What is the answer?</p>
+            <input type="number" id="answer" placeholder="Your answer" autofocus>
+            <button id="submitBtn">Submit Answer</button>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden results-screen">
+            <div class="success-icon">✓</div>
+            <h1>Well Done!</h1>
+            <p class="intro">You've completed the times tables assessment</p>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">Student Number</div>
+                    <div class="result-value" id="finalStudent"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Class</div>
+                    <div class="result-value" id="finalClass"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Score</div>
+                    <div class="result-value" id="finalScore"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Accuracy</div>
+                    <div class="result-value" id="finalAccuracy"></div>
+                </div>
+            </div>
+            
+            <div class="success-message">
+                <strong>✓ Your results have been saved!</strong><br>
+                Your teacher will be able to see your progress.
+            </div>
+            
+            <button id="restartBtn">Start Another Assessment</button>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxE0eyJ8mCJ2Pne6Cn7Vh799uQ_L1q5w7_tWI54Ffc9W0QJPjvmRgYbr4dPm-0OzokI/exec';
+        
+        // State
+        let studentNumber = '';
+        let classLetter = '';
+        let questions = [];
+        let currentQuestion = 0;
+        let results = [];
+        let startTime = null;
+        let totalStartTime = null;
+        let timerInterval = null;
+        
+        // DOM elements
+        const startScreen = document.getElementById('startScreen');
+        const questionScreen = document.getElementById('questionScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const studentInput = document.getElementById('studentNumber');
+        const classInput = document.getElementById('classLetter');
+        const startBtn = document.getElementById('startBtn');
+        const answerInput = document.getElementById('answer');
+        const submitBtn = document.getElementById('submitBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        // Generate questions
+        function generateQuestions() {
+            const tables = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            const qs = [];
+            for (let i = 0; i < 20; i++) {
+                const num1 = tables[Math.floor(Math.random() * tables.length)];
+                const num2 = Math.floor(Math.random() * 12) + 1;
+                qs.push({ num1, num2, answer: num1 * num2 });
+            }
+            return qs;
+        }
+        
+        // Format time
+        function formatTime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return minutes + ':' + remainingSeconds.toString().padStart(2, '0');
+        }
+        
+        // Update timer
+        function updateTimer() {
+            const elapsed = Date.now() - totalStartTime;
+            document.getElementById('timer').textContent = formatTime(elapsed);
+        }
+        
+        // Start assessment
+        startBtn.addEventListener('click', () => {
+            studentNumber = studentInput.value.trim();
+            classLetter = classInput.value.trim().toUpperCase();
+            
+            if (!studentNumber || !classLetter) {
+                alert('Please enter both your student number and class letter');
+                return;
+            }
+            
+            questions = generateQuestions();
+            currentQuestion = 0;
+            results = [];
+            
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            
+            totalStartTime = Date.now();
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 100);
+            
+            showQuestion();
+        });
+        
+        // Show question
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.num1 + ' × ' + q.num2;
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+            document.getElementById('progressFill').style.width = ((currentQuestion + 1) / 20 * 100) + '%';
+            answerInput.value = '';
+            answerInput.focus();
+        }
+        
+        // Submit answer
+        function submitAnswer() {
+            const userAnswer = parseInt(answerInput.value);
+            if (isNaN(userAnswer)) return;
+            
+            const q = questions[currentQuestion];
+            const correct = userAnswer === q.answer;
+            const timeForQuestion = Date.now() - startTime;
+            
+            results.push({
+                question: q.num1 + ' × ' + q.num2,
+                userAnswer,
+                correctAnswer: q.answer,
+                correct,
+                time: timeForQuestion
+            });
+            
+            if (currentQuestion < 19) {
+                currentQuestion++;
+                startTime = Date.now();
+                showQuestion();
+            } else {
+                finishAssessment();
+            }
+        }
+        
+        submitBtn.addEventListener('click', submitAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitAnswer();
+        });
+        
+        // Finish assessment
+        function finishAssessment() {
+            clearInterval(timerInterval);
+            const totalTime = Date.now() - totalStartTime;
+            
+            questionScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            const correctCount = results.filter(r => r.correct).length;
+            const accuracy = (correctCount / 20 * 100).toFixed(1);
+            
+            document.getElementById('finalStudent').textContent = studentNumber;
+            document.getElementById('finalClass').textContent = classLetter;
+            document.getElementById('finalScore').textContent = correctCount + '/20';
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            
+            saveToGoogleSheets(correctCount, accuracy, totalTime);
+        }
+        
+        // Save to Google Sheets
+        async function saveToGoogleSheets(correctCount, accuracy, totalTime) {
+            const data = {
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                studentNumber: studentNumber,
+                classLetter: classLetter,
+                correctAnswers: correctCount,
+                totalQuestions: 20,
+                accuracy: accuracy,
+                totalTime: (totalTime / 1000).toFixed(1),
+                avgTimePerQuestion: (totalTime / 20000).toFixed(1)
+            };
+            
+            try {
+                await fetch(SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                console.log('Results saved successfully');
+            } catch (error) {
+                console.error('Error saving results:', error);
+            }
+        }
+        
+        // Restart
+        restartBtn.addEventListener('click', () => {
+            resultsScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            studentInput.value = '';
+            classInput.value = '';
+        });
+        
+        // Auto-uppercase class input
+        classInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+</body>
+</html>
